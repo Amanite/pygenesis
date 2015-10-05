@@ -1,0 +1,12 @@
+Read this if you plan to contribute.
+
+Introduction : 
+pygenesis is meant to generate whole planets with a proper geological model.
+
+TODO :
+
+1 : Implement simplex noise to seed points all over the sphere
+2 : Apply a voronoi tesselation over said points, resulting in an implementation of Worley noise (https://en.wikipedia.org/wiki/Worley_noise)
+3 : Find an algorithm to merge Voronoi cells in order to have tectonic plates
+4 : Apply geological rules in order to generate a heightmap
+5 : Further plans (erosion, rivers, rendering)
