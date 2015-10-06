@@ -7,7 +7,6 @@ def rand_surface_point():
     
     r1=random.random()
     r2=random.random()
-    
     angle1= r1 * 2 * math.pi
     angle2= math.acos( 1 - 2* r2)
     
@@ -27,3 +26,8 @@ def to_xyz(angle1,angle2,r=1):
     
     return (x,y,z)
     
+    
+def distance(a, b):
+    ax, ay = a
+    bx, by = b
+    return math.sqrt((ax - bx) ** 2 + (ay - by) ** 2)
