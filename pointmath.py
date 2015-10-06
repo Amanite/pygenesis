@@ -16,14 +16,14 @@ def rand_surface_point():
     
     return angle1,angle2
     
-def to_xyz(angle1,angle2):
+def to_xyz(angle1,angle2,r=1):
     
     a1,a2=rand_surface_point()
     
     #for a different radius just multiply all of these by r
-    x=math.sin(a1)*math.sin(a2)
-    y=math.cos(a1)*math.sin(a2)
-    z=math.cos(a2)
+    x=r*math.sin(a1)*math.sin(a2)
+    y=r*math.cos(a1)*math.sin(a2)
+    z=r*math.cos(a2)
     
     return (x,y,z)
     
