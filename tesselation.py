@@ -21,4 +21,4 @@ vor=q.Voronoi(points)
 
 #this is also just for show
 voronoi_plot_2d(vor)
-plt.show()
+plt.savefig("plot.jpg")
