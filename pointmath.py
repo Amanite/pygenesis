@@ -26,8 +26,11 @@ def to_xyz(angle1,angle2,r=1):
     
     return (x,y,z)
     
-    
 def distance(a, b):
     ax, ay = a
     bx, by = b
-    return math.sqrt((ax - bx) ** 2 + (ay - by) ** 2)
+    result = math.sqrt((ax - bx) ** 2 + (ay - by) ** 2)
+    if result > math.pi:
+        return math.fabs(result -(2*math.pi))
+    else:
+        return result
