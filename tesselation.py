@@ -5,12 +5,12 @@ import math
 
 #this is just for show
 from scipy.spatial import voronoi_plot_2d
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 
 class tesselated_sphere:
         
-    def __init__(self):
-        pointm=50
+    def __init__(self,pointm=50):
+        
         self.points=self.make_points(pointm)
         self.tesselation()
         self.fix_seams()
@@ -142,64 +142,65 @@ class tesselated_sphere:
         self.mercatorpoints=points
         
         
-        return vor,
-    def visualize_seam_fix(self):
+        return vor
         
-        vor=self.vor
-        points=self.points
-        incomplete=self.incomplete
+    #def visualize_seam_fix(self):
         
-        voronoi_plot_2d(vor)
-        #vertical
-        plt.plot([0,0],[-math.pi,2*math.pi],"r")
-        plt.plot([math.pi*2,math.pi*2],[-math.pi,2*math.pi],"r")
-        #horizontal
-        plt.plot([-math.pi*2,math.pi*4],[0,0],"r")
-        plt.plot([-math.pi*2,math.pi*4],[math.pi,math.pi],"r")
+        #vor=self.vor
+        #points=self.points
+        #incomplete=self.incomplete
         
-        c=0
-        for spoint in self.mark_regions:
-            point=points[spoint]
-            plt.text(point[0],point[1],str(c))
-            plt.plot(point[0],point[1],"ro")
-            c+=1
+        #voronoi_plot_2d(vor)
+        ##vertical
+        #plt.plot([0,0],[-math.pi,2*math.pi],"r")
+        #plt.plot([math.pi*2,math.pi*2],[-math.pi,2*math.pi],"r")
+        ##horizontal
+        #plt.plot([-math.pi*2,math.pi*4],[0,0],"r")
+        #plt.plot([-math.pi*2,math.pi*4],[math.pi,math.pi],"r")
+        
+        #c=0
+        #for spoint in self.mark_regions:
+            #point=points[spoint]
+            #plt.text(point[0],point[1],str(c))
+            #plt.plot(point[0],point[1],"ro")
+            #c+=1
             
-        for p in self.newcell:
-            v=vor.vertices[p]
-            plt.plot(v[0],v[1],"bo")
-        #duplicated points are in red, lines mark 0, 2pi for x 
-        #and 0 and pi for y
-        plt.savefig("tesselationtest2.jpg")
+        #for p in self.newcell:
+            #v=vor.vertices[p]
+            #plt.plot(v[0],v[1],"bo")
+        ##duplicated points are in red, lines mark 0, 2pi for x 
+        ##and 0 and pi for y
+        #plt.savefig("tesselationtest2.jpg")
         
-    def test_visualize(self):
-        vor=self.mercatorvor
-        points=self.mercatorpoints
-        incomplete=self.incomplete
+    #def test_visualize(self):
+        #vor=self.mercatorvor
+        #points=self.mercatorpoints
+        #incomplete=self.incomplete
         
-        voronoi_plot_2d(vor)
-        #vertical
-        plt.plot([0,0],[-math.pi,2*math.pi],"r")
-        plt.plot([math.pi*2,math.pi*2],[-math.pi,2*math.pi],"r")
-        #horizontal
-        plt.plot([-math.pi*2,math.pi*4],[0,0],"r")
-        plt.plot([-math.pi*2,math.pi*4],[math.pi,math.pi],"r")
+        #voronoi_plot_2d(vor)
+        ##vertical
+        #plt.plot([0,0],[-math.pi,2*math.pi],"r")
+        #plt.plot([math.pi*2,math.pi*2],[-math.pi,2*math.pi],"r")
+        ##horizontal
+        #plt.plot([-math.pi*2,math.pi*4],[0,0],"r")
+        #plt.plot([-math.pi*2,math.pi*4],[math.pi,math.pi],"r")
         
-        c=0
-        for spoint in incomplete:
-            point=points[spoint]
-            plt.text(point[0],point[1],str(c))
-            plt.plot(point[0],point[1],"ro")
-            c+=1
+        #c=0
+        #for spoint in incomplete:
+            #point=points[spoint]
+            #plt.text(point[0],point[1],str(c))
+            #plt.plot(point[0],point[1],"ro")
+            #c+=1
         
-        #duplicated points are in red, lines mark 0, 2pi for x 
-        #and 0 and pi for y
-        plt.savefig("tesselationtest.jpg")
+        ##duplicated points are in red, lines mark 0, 2pi for x 
+        ##and 0 and pi for y
+        #plt.savefig("tesselationtest.jpg")
         
     def fix_seams(self):
         #this should contain the regions...
         #ok, so I need to warp around the mirror
         rel_regions={}
-        
+        okregions=[]
         c=0
         m=len(self.vor.point_region)-1
         #find ALL bad regions
@@ -231,6 +232,7 @@ class tesselated_sphere:
                     
             if notokps ==[] and replacement_points==[]:
                 # this one is completely insde
+                okregions.append(region)
                 continue 
             #if okps==[] and replacement_points==[]:
             #    #this one is completely outside, just the seed point though.
@@ -244,6 +246,11 @@ class tesselated_sphere:
             
             rel_regions.update({seedp:[regionid,notokps,okps,replacement_points,]})
         
+        okverts=[]
+        for r in okregions:
+            for p in r:
+                okverts.append(p)
+        self.okregions=okregions        
         
         self.mark_regions=rel_regions
         hurr=[]
@@ -267,6 +274,7 @@ class tesselated_sphere:
         self.mark_regions=[]
         self.newcell=[]
         newregions=[]
+        newregionmap={}
         for orgp in self.newpointdict:
             
             m=self.newpointdict[orgp]
@@ -286,6 +294,8 @@ class tesselated_sphere:
                 regionid = self.vor.point_region[seed]
                 region = self.vor.regions[regionid]
                 for p in region:
+                    if p==-1:
+                        continue
                     coord = self.vor.vertices[p]
                     x = coord[0]
                     y = coord[1]
@@ -296,43 +306,64 @@ class tesselated_sphere:
             self.mark_regions+=seeds
             self.newcell+=newcell
             newregions+=[newcell]
-            
+            print(newcell)
+            newregionmap.update({orgp:newcell})
+        
         #now the reassign the indices and throw away everything else
         
         #first only carry over the verts I'm using...
         newverts=[]
         remap={}
         c=0
-        m=len(self.newcell)
+        m=len(self.vor.vertices)
         while c < m:
             #the index
-            v=self.newcell[c]
+            v=c
             vcord=self.vor.vertices[v]
-            if v not in self.newcell:
+            if v not in self.newcell and v not in okverts:
                 c+=1
                 continue
             newverts.append(vcord)
             remap.update({v:len(newverts)-1})
+            c+=1
         self.newverts=newverts
         
         #now go through all regions and switch out the indices
-        c=0
-        m=len(newregions)
-        while c < m:
-            r=newregions[c]
+        retregions=[]
+        remapregions=[]
+        for key in newregionmap:
+            r=newregionmap[key]
+            remapregions.append(r)
+        remapregions+=okregions
+        self.okregions=[]
+        for r in remapregions:
+            t=False
+            if r in okregions:
+                t=True
             c2=0
             m2=len(r)
-            while c < m2:
+            change=False
+            while c2 < m2:
                 vind=r[c2]
                 if vind in remap:
                     r[c2]=remap[vind]
-        self.newregions=self.newregions
+                    change=True
+                c2+=1
+            if change==True:
+                retregions.append(r)
+            if t==True:
+                self.okregions.append(r)
+            
+        
+        
+        self.newregions=retregions
         
         
         #the final sphere can now be built with 
         #self.newverts
         #and
         #self.newregions
+        #uuuh...
         
 def test():
     S=tesselated_sphere()
